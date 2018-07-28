@@ -63,10 +63,7 @@ exports.getUsers = functions.https.onRequest((request, response) => {
           res.on('data', chunk => { rawData += chunk; });
           res.on('end', () => {
               console.log('Data from web');
-              //cors(request, response, () => {
-                response.status(200).send(prepareData(rawData));
-              //});
-
+              response.status(200).send(prepareData(rawData));
           });
       });
       req.on('error', e => {
