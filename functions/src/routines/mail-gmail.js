@@ -18,8 +18,8 @@ const mailTransport = nodemailer.createTransport({
   },
 });
 
-module.exports.send = function (letter, callback) {
-  return mailTransport.sendMail(letter).then(() => {
+module.exports.send = function (message, callback) {
+  return mailTransport.sendMail(message).then(() => {
   	callback({
   		ok: true
   	});
