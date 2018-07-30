@@ -1,12 +1,16 @@
-const cacheTimeLife = 300; // seconds 
-
 const functions = require('firebase-functions');
 const https = require('https');
 const cors = require('cors')({origin: true});    
 const cache = require('./routines/cache');
 
-// firebase functions:config:set slack.tokens.usersList="..."
-const slackTokenUsersList = functions.config().slack.tokens.users;
+const config = functions.config();
+// firebase functions:config:set cache.timelife="..."
+var cacheTimeLife = 300; // seconds
+if (config.cache && config.cache.timelife !== undefined) {
+  cacheTimeLife = config.cache.timelife;
+}
+// firebase functions:config:set slack.tokens.users="..."
+const slackTokenUsersList = config.slack.tokens.users;
 
 function prepareData(rawData) {
   let result = { success: false };
@@ -16,13 +20,13 @@ function prepareData(rawData) {
   } catch (err) {
     result.message = "Parse rawData error";
     result.error = err;
-    return result;
+    throw new Error(result);
   }
  
   if (jsonRawData.ok && jsonRawData.members) {
     result.success = true;
     result.items = [];
-    if (jsonRawData.members) {
+    if (jsonRawData.members && jsonRawData.members.length) {
       let length = jsonRawData.members.length;
       for (i = 0; i < length; i++) {
         if (!jsonRawData.members[i].deleted && !jsonRawData.members[i].is_bot && jsonRawData.members[i].name !== 'slackbot') {
@@ -33,9 +37,13 @@ function prepareData(rawData) {
           });          
         }
       }
+    } else {
+      throw new Error('Users not found!');  
     }
-  }
-  cache.write('users', cacheTimeLife, result);
+    cache.write('users', cacheTimeLife, result);
+  } else {
+    throw new Error('getUsers() has unsuccessful answer!');
+  }  
 
   return result;
 }
@@ -68,6 +76,7 @@ exports.getUsers = functions.https.onRequest((request, response) => {
       });
       req.on('error', e => {
           response.status(500).send(`Error: ${e.message}`);
+          throw new Error(e);
       });
       req.end();    
     });

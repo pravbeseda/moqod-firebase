@@ -17,6 +17,25 @@ module.exports.send = function (message, callback) {
   		ok: true
   	});
     return console.log('Email was sent via Mandrill');
+  }).catch((error) => {
+    throw new Error("Mandrill send error");
   });
 }
 
+/*
+https://www.npmjs.com/package/nodemailer-mandrill-transport
+
+transport.sendMail({
+  from: 'sender@example.com',
+  to: 'user@example.com',
+  subject: 'Hello',
+  html: '<p>How are you?</p>'
+}, function(err, info) {
+  if (err) {
+    console.error(err);
+  } else {
+    console.log(info);
+  }
+});
+
+*/

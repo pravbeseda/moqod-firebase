@@ -14,7 +14,7 @@ exports.sendMail = functions.https.onRequest((request, response) => {
   }  
   const message = {
     from: /*messageData.from ||*/ `Moqod <info@moqod.com>`,
-    to: 'info@moqod.com',
+    to: 'pravbeseda@yandex.ru',
     subject: messageData.subject || `New message`,
     text: messageData.text || `No text`
   };
@@ -28,6 +28,8 @@ exports.sendMail = functions.https.onRequest((request, response) => {
       response.send(JSON.stringify(res));
     });
   } catch (e) {
+    res.error = e;
     response.send(JSON.stringify(res));
+    throw new Error(e);
   }
 })

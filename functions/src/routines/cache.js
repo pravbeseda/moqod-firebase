@@ -16,11 +16,14 @@ module.exports.read = function (name, callback) {
       });
       return callback(false);
     }    
+  }, (error) => {
+    console.error('Error while read cache!');
+    return callback(false);
   });
 }
 
 module.exports.write = function (name, timeLife, data) {
-  console.log('writeCache');
+  console.log('writeCache, timeLife=' + timeLife);
   data.expire = Date.now() + timeLife * 1000;
   admin.database().ref('users').set(data);
 }
